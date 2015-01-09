@@ -10,7 +10,8 @@ var models = require('models'), //Aliased by browserify
     Send = require('./send').Send,
     Receive = require('./receive2').Receive,
     Overview = require('./overview'),
-    History = require('./history');
+    History = require('./history'),
+    Trade = require('./trade');
 
 $(document).ready(function() {
   React.initializeTouchEvents(true);
@@ -42,7 +43,7 @@ var App = React.createClass({
       }
       return defaultTabName;
   },
-  tabs: ['Overview', 'Send', 'Receive', 'History'],
+  tabs: ['Overview', 'Send', 'Receive', 'History', 'Trade'],
   walletWasUpdated: function () {
      this.setState({
          lastUpdate: Date.now()
@@ -76,6 +77,7 @@ var App = React.createClass({
               <div className={show('Receive')} ><Receive wallet={wallet} app={this}/></div>
               <div className={show('Send')} ><Send wallet={wallet} app={this}/></div>
               <div className={show('History') }><History wallet={wallet}/></div>
+              <div className={show('Trade')} ><Trade wallet={wallet} /></div>
            </div>
       );
       //        <div className={show('Assets')} ><Assets /></div>
