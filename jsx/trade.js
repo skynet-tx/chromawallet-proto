@@ -3,24 +3,54 @@
 var React = require('react');
 
 var SelectBox = React.createClass({
+	handleChange: function (eve){
+		var optionValue = eve.target.value;
+		this.setState({option: optionValue});
+		this.props.onOptionChange({currency: optionValue});
+	},
+
+	getInitialState: function() {
+		return {option: '#'};
+	},
+
 	render: function () {
-		var options = this.props.options;
+		var options = this.props.options,
+			value = this.state.option;
 
 		return (
 			<div className="row">
 				<div className="twelve columns">
 					<div className="field">
 						<div className="picker">
-							<select id="receive-filter">
+							<select value={value}
+								onChange={this.handleChange}
+								id="receive-filter">
 								<option value="#">Show only</option>
-								<option>Bitcoin</option>
-								<option>Gold-coin</option>
-								<option>Foo-coin</option>
+							{
+								options.map(function (option) {
+									if(option.getMoniker() === "bitcoin") return;
+
+									return (
+										<SelectBoxOption key={option.getAddress()} option={option} />
+									);
+								})
+							}
 							</select>
 						</div>
 					</div>
 				</div>
 			</div>
+		);
+	}
+});
+
+var SelectBoxOption = React.createClass({
+	render: function () {
+		var option = this.props.option,
+			available = option.getAvailableBalance(),
+			text = option.getMoniker() + " (" + available + " available)";
+		return (
+			<option value={option.getMoniker()}>{text}</option>
 		);
 	}
 });
@@ -144,6 +174,15 @@ var EventLogBlock = React.createClass({
 
 
 var Trade = React.createClass({
+
+	getInitialState: function() {
+		return {tradeData: {}};
+	},
+
+	handleItemChange: function(optionCurrency){
+		this.setState({tradeData: optionCurrency});
+	},
+
 	render: function () {
 		var options = this.props.wallet.getAssetModels();
 
@@ -152,7 +191,7 @@ var Trade = React.createClass({
 				<div className="row">
 					<h2>P2P Trade</h2>
 				</div>
-				<SelectBox options={options} />
+				<SelectBox onOptionChange={this.handleItemChange} options={options} />
 
 				<div className="row">
 
