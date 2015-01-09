@@ -57,14 +57,15 @@ var SelectBoxOption = React.createClass({
 
 var BuyBlock = React.createClass({
 	render: function () {
+		var isDisabled = (this.props.tradeData.currency && this.props.tradeData.currency != "#") ? false : true;
 		return (
 			<fieldset>
 				<legend>Buy</legend>
 				<ul>
 					<li className="field">
-						<input className="narrow text input" id="text1" type="text" placeholder="Quantity" />
+						<input className="narrow text input" disabled={isDisabled} id="text1" type="text" placeholder="Quantity" />
 						<span>&nbsp;X&nbsp;</span>
-						<input className="narrow text input" id="text2" type="text" placeholder="Price" />
+						<input className="narrow text input" disabled={isDisabled} id="text2" type="text" placeholder="Price" />
 					</li>
 					<li className="row">
 						<div className="eight columns">
@@ -75,7 +76,7 @@ var BuyBlock = React.createClass({
 						</div>
 						<div className="four columns">
 							<div className="medium primary btn">
-								<a href="#">Buy</a>
+								<a disabled={isDisabled} href="#">Buy</a>
 							</div>
 						</div>
 					</li>
@@ -110,14 +111,15 @@ var BuyTable = React.createClass({
 
 var SellBlock = React.createClass({
 	render: function () {
+		var isDisabled = (this.props.tradeData.currency && this.props.tradeData.currency != "#") ? false : true;
 		return (
 			<fieldset>
 				<legend>Sell</legend>
 				<ul>
 					<li className="field">
-						<input className="narrow text input" id="text1" type="text" placeholder="Quantity" />
+						<input className="narrow text input" disabled={isDisabled} id="text1" type="text" placeholder="Quantity" />
 						<span>&nbsp;X&nbsp;</span>
-						<input className="narrow text input" id="text2" type="text" placeholder="Price" />
+						<input className="narrow text input" disabled={isDisabled} id="text2" type="text" placeholder="Price" />
 					</li>
 					<li className="row">
 						<div className="eight columns">
@@ -128,7 +130,7 @@ var SellBlock = React.createClass({
 						</div>
 						<div className="four columns">
 							<div className="medium primary btn">
-								<a href="#">Sell</a>
+								<a disabled={isDisabled} href="#">Sell</a>
 							</div>
 						</div>
 					</li>
@@ -196,13 +198,13 @@ var Trade = React.createClass({
 				<div className="row">
 
 					<div className="four columns">
-						<BuyBlock/>
-						<BuyTable/>
+						<BuyBlock tradeData={this.state.tradeData} />
+						<BuyTable tradeData={this.state.tradeData} />
 					</div>
 
 					<div className="four columns">
-						<SellBlock/>
-						<SellTable/>
+						<SellBlock tradeData={this.state.tradeData} />
+						<SellTable tradeData={this.state.tradeData} />
 					</div>
 
 					<div className="four columns">
