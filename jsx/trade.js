@@ -10,7 +10,7 @@ var tradeMixins = {
 		this.setState({quantity: quantity});
 		this.setState({price: price});
 
-		if(quantity && price){
+		if (quantity && price) {
 			this.setTotalValue(parseFloat(quantity * price).toFixed(2));
 		} else {
 			this.setTotalValue(0);
@@ -19,13 +19,20 @@ var tradeMixins = {
 	},
 
 	getNumbersValue: function (val) {
-		var pattern = /[^0-9.]+/g,
-			result = val.replace(pattern, "");
-		return result;
+		var pattern = /[^0-9.]+/g;
+		return val.replace(pattern, "");
 	},
 
-	setTotalValue: function(value){
+	setTotalValue: function (value) {
 		this.setState({total: value});
+	},
+
+	handleOnQuantityChange: function (newValue) {
+		this.setState({quantity: newValue}, this.getSumForBuyBlock);
+	},
+
+	handleOnPriceChange: function (newValue) {
+		this.setState({price: newValue}, this.getSumForBuyBlock);
 	}
 
 };
@@ -92,14 +99,6 @@ var BuyBlock = React.createClass({
 			price: "",
 			total: 0
 		};
-	},
-
-	handleOnQuantityChange: function (newValue) {
-		this.setState({quantity: newValue}, this.getSumForBuyBlock);
-	},
-
-	handleOnPriceChange: function (newValue) {
-		this.setState({price: newValue}, this.getSumForBuyBlock);
 	},
 
 	render: function () {
@@ -170,20 +169,45 @@ var BuyTable = React.createClass({
 });
 
 var SellBlock = React.createClass({
+	mixins: [tradeMixins],
+
+	getInitialState: function () {
+		return {
+			quantity: "",
+			price: "",
+			total: 0
+		};
+	},
+
 	render: function () {
 		var isDisabled = (this.props.tradeData.currency && this.props.tradeData.currency != "#") ? false : true;
+		var quantity = {
+				value: this.state.quantity,
+				requestChange: this.handleOnQuantityChange
+			},
+			price = {
+				value: this.state.price,
+				requestChange: this.handleOnPriceChange
+			};
+
 		return (
 			<fieldset>
 				<legend>Sell</legend>
 				<ul>
 					<li className="field">
-						<input className="narrow text input" disabled={isDisabled} id="text1" type="text" placeholder="Quantity" />
+						<input className="narrow text input"
+							valueLink={quantity}
+							disabled={isDisabled} id="text1"
+							type="text" placeholder="Quantity" />
 						<span>&nbsp;X&nbsp;</span>
-						<input className="narrow text input" disabled={isDisabled} id="text2" type="text" placeholder="Price" />
+						<input className="narrow text input"
+							valueLink={price}
+							disabled={isDisabled}
+							id="text2" type="text" placeholder="Price" />
 					</li>
 					<li className="row">
 						<div className="eight columns">
-							<div>Total: 123.40</div>
+							<div>Total: {this.state.total}</div>
 							<div>Available:
 								<span>14 BTC</span>
 							</div>
