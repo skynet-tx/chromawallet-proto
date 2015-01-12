@@ -3,27 +3,29 @@
 var React = require('react');
 
 var tradeMixins = {
-	getSumForBuyBlock: function(){
-		console.log(">>", this.state);
-		var quantity = this.state.quantity,
-			price = this.state.price;
+	getSumForBuyBlock: function () {
+		var quantity = this.getNumbersValue(this.state.quantity),
+			price = this.getNumbersValue(this.state.price);
 
-		//if(!this.checkForIntValue(quantity)){
-		//	this.setState({quantity: ''});
-		//}
-		//
-		//if(!this.checkForIntValue(price)){
-		//	this.setState({price: ''});
-		//}
-		//
-		//console.log("quantity >>", quantity);
-		//console.log("price >>", price);
+		this.setState({quantity: quantity});
+		this.setState({price: price});
+
+		if(quantity && price){
+			this.setTotalValue(parseFloat(quantity * price).toFixed(2));
+		} else {
+			this.setTotalValue(0);
+		}
 
 	},
 
-	checkForIntValue: function (val) {
-		var reg = new RegExp('^\\d+$');
-		return reg.test(val);
+	getNumbersValue: function (val) {
+		var pattern = /[^0-9.]+/g,
+			result = val.replace(pattern, "");
+		return result;
+	},
+
+	setTotalValue: function(value){
+		this.setState({total: value});
 	}
 
 };
@@ -92,38 +94,42 @@ var BuyBlock = React.createClass({
 		};
 	},
 
-	handleOnQuantityChange: function (eve) {
-		var quantity = eve.target.value;
-		this.setState({quantity: quantity}, this.getSumForBuyBlock);
+	handleOnQuantityChange: function (newValue) {
+		this.setState({quantity: newValue}, this.getSumForBuyBlock);
 	},
 
-	handleOnPriceChange: function (eve) {
-		var price = eve.target.value;
-		this.setState({price: price}, this.getSumForBuyBlock);
+	handleOnPriceChange: function (newValue) {
+		this.setState({price: newValue}, this.getSumForBuyBlock);
 	},
 
 	render: function () {
 		var isDisabled = (this.props.tradeData.currency && this.props.tradeData.currency != "#") ? false : true;
+		var quantity = {
+				value: this.state.quantity,
+				requestChange: this.handleOnQuantityChange
+			},
+			price = {
+				value: this.state.price,
+				requestChange: this.handleOnPriceChange
+			};
 		return (
 			<fieldset>
 				<legend>Buy</legend>
 				<ul>
 					<li className="field">
 						<input className="narrow text input"
-							value={this.state.quantity}
-							onKeyUp={this.handleOnQuantityChange}
+							valueLink={quantity}
 							disabled={isDisabled} id="text1"
 							type="text" placeholder="Quantity" />
 						<span>&nbsp;X&nbsp;</span>
 						<input className="narrow text input"
-							onKeyPress={this.handleOnPriceChange}
 							disabled={isDisabled}
-							value={this.state.price}
+							valueLink={price}
 							id="text2" type="text" placeholder="Price" />
 					</li>
 					<li className="row">
 						<div className="eight columns">
-							<div>Total: 123.40</div>
+							<div>Total: {this.state.total}</div>
 							<div>Available:
 								<span>14 BTC</span>
 							</div>
