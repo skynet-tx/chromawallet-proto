@@ -2,14 +2,40 @@
 
 var React = require('react');
 
+var tradeMixins = {
+	getSumForBuyBlock: function(){
+		console.log(">>", this.state);
+		var quantity = this.state.quantity,
+			price = this.state.price;
+
+		//if(!this.checkForIntValue(quantity)){
+		//	this.setState({quantity: ''});
+		//}
+		//
+		//if(!this.checkForIntValue(price)){
+		//	this.setState({price: ''});
+		//}
+		//
+		//console.log("quantity >>", quantity);
+		//console.log("price >>", price);
+
+	},
+
+	checkForIntValue: function (val) {
+		var reg = new RegExp('^\\d+$');
+		return reg.test(val);
+	}
+
+};
+
 var SelectBox = React.createClass({
-	handleChange: function (eve){
+	handleChange: function (eve) {
 		var optionValue = eve.target.value;
 		this.setState({option: optionValue});
 		this.props.onOptionChange({currency: optionValue});
 	},
 
-	getInitialState: function() {
+	getInitialState: function () {
 		return {option: '#'};
 	},
 
@@ -28,13 +54,13 @@ var SelectBox = React.createClass({
 								<option value="#">Show only</option>
 							{
 								options.map(function (option) {
-									if(option.getMoniker() === "bitcoin") return;
+									if (option.getMoniker() === "bitcoin") return;
 
 									return (
 										<SelectBoxOption key={option.getAddress()} option={option} />
 									);
 								})
-							}
+								}
 							</select>
 						</div>
 					</div>
@@ -56,6 +82,26 @@ var SelectBoxOption = React.createClass({
 });
 
 var BuyBlock = React.createClass({
+	mixins: [tradeMixins],
+
+	getInitialState: function () {
+		return {
+			quantity: "",
+			price: "",
+			total: 0
+		};
+	},
+
+	handleOnQuantityChange: function (eve) {
+		var quantity = eve.target.value;
+		this.setState({quantity: quantity}, this.getSumForBuyBlock);
+	},
+
+	handleOnPriceChange: function (eve) {
+		var price = eve.target.value;
+		this.setState({price: price}, this.getSumForBuyBlock);
+	},
+
 	render: function () {
 		var isDisabled = (this.props.tradeData.currency && this.props.tradeData.currency != "#") ? false : true;
 		return (
@@ -63,9 +109,17 @@ var BuyBlock = React.createClass({
 				<legend>Buy</legend>
 				<ul>
 					<li className="field">
-						<input className="narrow text input" disabled={isDisabled} id="text1" type="text" placeholder="Quantity" />
+						<input className="narrow text input"
+							value={this.state.quantity}
+							onKeyUp={this.handleOnQuantityChange}
+							disabled={isDisabled} id="text1"
+							type="text" placeholder="Quantity" />
 						<span>&nbsp;X&nbsp;</span>
-						<input className="narrow text input" disabled={isDisabled} id="text2" type="text" placeholder="Price" />
+						<input className="narrow text input"
+							onKeyPress={this.handleOnPriceChange}
+							disabled={isDisabled}
+							value={this.state.price}
+							id="text2" type="text" placeholder="Price" />
 					</li>
 					<li className="row">
 						<div className="eight columns">
@@ -177,11 +231,11 @@ var EventLogBlock = React.createClass({
 
 var Trade = React.createClass({
 
-	getInitialState: function() {
+	getInitialState: function () {
 		return {tradeData: {}};
 	},
 
-	handleItemChange: function(optionCurrency){
+	handleItemChange: function (optionCurrency) {
 		this.setState({tradeData: optionCurrency});
 	},
 
